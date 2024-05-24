@@ -1,5 +1,7 @@
 "use client";
 
+import { LoginSchema, loginSchema } from "@/lib/schemas/loginSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Card, CardBody, CardHeader, Input } from "@nextui-org/react";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -10,9 +12,12 @@ export default function LoginForm() {
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm();
+  } = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
+    mode:"onTouched"
+  });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: LoginSchema) => {
     console.log(data);
   };
   return (
@@ -33,7 +38,7 @@ export default function LoginForm() {
               defaultValue=""
               label="Email"
               variant="bordered"
-              {...register("email", { required: "Email is required" })}
+              {...register("email")}
               isInvalid={!!errors.email}
               errorMessage={errors.email?.message as string}
             />
@@ -42,7 +47,7 @@ export default function LoginForm() {
               label="Password"
               variant="bordered"
               type="password"
-              {...register("password", { required: "Password is required" })}
+              {...register("password")}
               isInvalid={!!errors.password}
               errorMessage={errors.password?.message as string}
             />
