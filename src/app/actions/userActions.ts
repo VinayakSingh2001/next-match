@@ -5,6 +5,7 @@ import { ActionResult } from "@/types";
 import { Member, Photo } from "@prisma/client";
 import { getAuthUserId } from "./authActions";
 import { prisma } from "@/lib/prisma";
+import { cloudinary } from "@/lib/cloudinary";
 
 export async function updateMemberProfile(data:MemberEditSchema, nameUpdated: boolean):Promise<ActionResult<Member>> {
     try {
@@ -71,6 +72,27 @@ export async function setMainImage(photo: Photo) {
             data:{image: photo.url}
         })
 
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
+
+export async function deleteImage(photo:Photo) {
+    //inside here we need to do two things, we need to delete the image from cloudinary if it has a public id and also update the Db also.
+    try {
+        const userId = await getAuthUserId();
+        if(photo.publicId){
+            await cloudinary.v2.uploader.destroy(photo.publicId)
+        }
+        return prisma.member.update({
+            where:{userId},
+            data:{
+                photos:{
+                    delete:{id:photo.id}
+                }
+            }
+        })
     } catch (error) {
         console.log(error)
         throw error

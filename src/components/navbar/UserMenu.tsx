@@ -1,6 +1,7 @@
 'use client'
 
 import { signOutUser } from '@/app/actions/authActions'
+import { transformImageUrl } from '@/lib/util'
 import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from '@nextui-org/react'
 import { Session } from 'next-auth'
 import Link from 'next/link'
@@ -15,7 +16,7 @@ export default function UserMenu({userInfo}:Props) {
   return (
     <Dropdown placement='bottom-end'>
         <DropdownTrigger>
-            <Avatar isBordered as='button' className='transition-transform' color='secondary' name={userInfo?.name || 'user'} size='sm' src={userInfo?.image || '/images/user.png'}  />
+            <Avatar isBordered as='button' className='transition-transform' color='secondary' name={userInfo?.name || 'user'} size='sm' src={transformImageUrl(userInfo?.image) || '/images/user.png'}  />
         </DropdownTrigger>
         <DropdownMenu variant='flat' aria-label='User action menu'>
             <DropdownSection showDivider>

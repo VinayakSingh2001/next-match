@@ -11,7 +11,7 @@ export default function MemberImage({photo}:Props) {
   return (
     <div>
       {photo?.publicId ? (
-        <CldImage alt='Image of member' src={photo.publicId} width={300} height={300} crop='fill' gravity='faces' className='rounded-2xl'/>
+        <CldImage alt='Image of member' src={photo.publicId} width={300} height={300} crop='fill' gravity='faces' className='rounded-2xl' priority/>
       ):(
         <Image width={200} height={200} src={photo?.url || '/images/user.png'} alt='Image of user' />
       )}
