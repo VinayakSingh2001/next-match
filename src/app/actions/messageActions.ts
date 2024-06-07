@@ -67,9 +67,72 @@ export async function getMessageThread(recipientId:string) {
                 }
             }
         })
+
+        if(messages.length > 0){
+            await prisma.message.updateMany({
+                where:{
+                    senderId: recipientId,
+                    recipientId : userId,
+                    dateRead: null,
+
+
+                }
+                , data:{dateRead: new Date()}
+            })
+        }
+
+
         return messages.map(message=>mapMessageToMessageDTO(message))
     } catch (error) {
         console.log(error)
         throw error
     }
 }
+
+
+//createing action for getting the messages for the container that we are interested in that is 'INBOX" ans "OUTBOX"
+export async function getMessageByContainer(container:string) {
+    try {
+        const userId = await getAuthUserId()
+        //now we need to decide what we are gonna fetch from the db, 
+        //if we are working with the outbox,then we need to get the messages where the userId is the senderId 
+        //And if we are working with the inbox, then the userId will be equal to the recipientId
+
+        const selector  = container === 'outbox'?'senderId':'recipientId';
+        const messages = await prisma.message.findMany({
+            where:{
+                [selector]: userId,
+            },
+            orderBy:{
+                created:'desc'
+            },
+            select:{
+                id:true,
+                text:true,
+                created:true,
+                dateRead:true,
+                sender:{
+                    select:{
+                        userId:true,
+                        name:true,
+                        image:true
+                    }
+                },
+                recipient:{
+                    select:{
+                        userId:true,
+                        name:true,
+                        image:true
+                    }
+                }
+            }
+        })
+        return messages.map(message=>mapMessageToMessageDTO(message))
+
+
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
+
