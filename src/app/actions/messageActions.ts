@@ -1,17 +1,19 @@
 "use server";
 
 import { MessageSchema, messageSchema } from "@/lib/schemas/messageSchema";
-import { ActionResult } from "@/types";
+import { ActionResult, MessageDTO } from "@/types";
 import { Message } from "@prisma/client";
 import { getAuthUserId } from "./authActions";
 import { prisma } from "@/lib/prisma";
 import { mapMessageToMessageDTO } from "@/lib/mappings";
+import { pusherServer } from "@/lib/pusher";
+import { createChatId } from "@/lib/util";
 
 //ye ek function h jiski help se hum kisi ko message bheej sakte h
 export async function createMessage(
   recipientUserId: string,
   data: MessageSchema
-): Promise<ActionResult<Message>> {
+): Promise<ActionResult<MessageDTO>> {
   try {
     const userId = await getAuthUserId();
     const validated = messageSchema.safeParse(data);
@@ -21,9 +23,13 @@ export async function createMessage(
     const { text } = validated.data;
     const message = await prisma.message.create({
       data: { text, recipientId: recipientUserId, senderId: userId },
+      select: messageSelect
     });
 
-    return { status: "success", data: message };
+    const messageDTO = mapMessageToMessageDTO(message)
+    await pusherServer.trigger(createChatId(userId,recipientUserId), 'message:new', messageDTO)
+
+    return { status: "success", data: messageDTO };
   } catch (error) {
     console.log(error);
     return { status: "error", error: "something went wrong" };
@@ -41,12 +47,12 @@ export async function getMessageThread(recipientId: string) {
           {
             senderId: userId,
             recipientId,
-            senderDeleted:false
+            senderDeleted: false,
           },
           {
             senderId: recipientId,
             recipientId: userId,
-            recipientDeleted:false
+            recipientDeleted: false,
           },
         ],
       },
@@ -55,26 +61,7 @@ export async function getMessageThread(recipientId: string) {
         created: "asc",
       },
       //now get some info about the sender , name , image , the userId and same for the recipient
-      select: {
-        id: true,
-        text: true,
-        created: true,
-        dateRead: true,
-        sender: {
-          select: {
-            userId: true,
-            name: true,
-            image: true,
-          },
-        },
-        recipient: {
-          select: {
-            userId: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
+      select: messageSelect,
     });
 
     if (messages.length > 0) {
@@ -104,34 +91,17 @@ export async function getMessageByContainer(container: string) {
     //And if we are working with the inbox, then the userId will be equal to the recipientId
 
     const conditions = {
-        [container === "outbox" ? "senderId" : "recipientId"]: userId,
-        ...(container === 'outbox'? {senderDeleted:false}:{recipientDeleted:false})
-      };
+      [container === "outbox" ? "senderId" : "recipientId"]: userId,
+      ...(container === "outbox"
+        ? { senderDeleted: false }
+        : { recipientDeleted: false }),
+    };
     const messages = await prisma.message.findMany({
       where: conditions,
       orderBy: {
         created: "desc",
       },
-      select: {
-        id: true,
-        text: true,
-        created: true,
-        dateRead: true,
-        sender: {
-          select: {
-            userId: true,
-            name: true,
-            image: true,
-          },
-        },
-        recipient: {
-          select: {
-            userId: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
+      select: messageSelect,
     });
     return messages.map((message) => mapMessageToMessageDTO(message));
   } catch (error) {
@@ -143,7 +113,6 @@ export async function getMessageByContainer(container: string) {
 export async function deleteMessage(messageId: string, isOutbox: boolean) {
   const userId = await getAuthUserId();
   const selector = isOutbox ? "senderDeleted" : "recipientDeleted";
-  
 
   try {
     const userId = await getAuthUserId();
@@ -183,3 +152,23 @@ export async function deleteMessage(messageId: string, isOutbox: boolean) {
   }
 }
 
+const messageSelect = {
+  id: true,
+  text: true,
+  created: true,
+  dateRead: true,
+  sender: {
+    select: {
+      userId: true,
+      name: true,
+      image: true,
+    },
+  },
+  recipient: {
+    select: {
+      userId: true,
+      name: true,
+      image: true,
+    },
+  },
+};
