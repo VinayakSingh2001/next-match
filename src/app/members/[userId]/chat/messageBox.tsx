@@ -4,7 +4,11 @@ import { MessageDTO } from "@/types";
 import React, { useEffect, useRef } from "react";
 import clsx from "clsx";
 import { Avatar, divider } from "@nextui-org/react";
+<<<<<<< HEAD
 import { timeAgo, transformImageUrl } from "@/lib/util";
+=======
+import { transformImageUrl } from "@/lib/util";
+>>>>>>> 08f073ce01c7fc0fc51a9b12530a1042b14ed11f
 
 type Props = {
   message: MessageDTO;
@@ -40,7 +44,11 @@ export default function MessageBox({ message, currentUserId }: Props) {
     })}>
         {message.dateRead && message.recipientId !== currentUserId ? (
             <span className="text-xs text-black text-itaic ">
+<<<<<<< HEAD
                 (Read {timeAgo(message.dateRead)})
+=======
+                (Read 4 mins ago)
+>>>>>>> 08f073ce01c7fc0fc51a9b12530a1042b14ed11f
             </span>
         ): <div></div>}
         <div className="flex">

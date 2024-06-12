@@ -18,10 +18,13 @@ if(!global.pusherServerInstance){
 
 if(!global.pusherClientInstance){
     global.pusherClientInstance = new PusherClient(process.env.NEXT_PUBLIC_PUSHER_APP_KEY!, {
+<<<<<<< HEAD
         channelAuthorization:{
             endpoint:'/api/pusher-auth',
             transport:'ajax'
         },
+=======
+>>>>>>> 08f073ce01c7fc0fc51a9b12530a1042b14ed11f
         cluster:'ap2'
     })
 }

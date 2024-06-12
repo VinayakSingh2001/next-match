@@ -26,9 +26,13 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+<<<<<<< HEAD
 .env*.local
 .env
 
+=======
+.env
+>>>>>>> 08f073ce01c7fc0fc51a9b12530a1042b14ed11f
 # vercel
 .vercel
 

@@ -23,6 +23,7 @@ export async function createMessage(
     const { text } = validated.data;
     const message = await prisma.message.create({
       data: { text, recipientId: recipientUserId, senderId: userId },
+<<<<<<< HEAD
       select: messageSelect,
     });
 
@@ -32,6 +33,13 @@ export async function createMessage(
       "message:new",
       messageDTO
     );
+=======
+      select: messageSelect
+    });
+
+    const messageDTO = mapMessageToMessageDTO(message)
+    await pusherServer.trigger(createChatId(userId,recipientUserId), 'message:new', messageDTO)
+>>>>>>> 08f073ce01c7fc0fc51a9b12530a1042b14ed11f
 
     return { status: "success", data: messageDTO };
   } catch (error) {
@@ -69,6 +77,7 @@ export async function getMessageThread(recipientId: string) {
     });
 
     if (messages.length > 0) {
+<<<<<<< HEAD
       const readMessageIds = messages
         .filter(
           (m) =>
@@ -84,6 +93,16 @@ export async function getMessageThread(recipientId: string) {
       });
 
       await pusherServer.trigger(createChatId(recipientId, userId), 'messages:read', readMessageIds)
+=======
+      await prisma.message.updateMany({
+        where: {
+          senderId: recipientId,
+          recipientId: userId,
+          dateRead: null,
+        },
+        data: { dateRead: new Date() },
+      });
+>>>>>>> 08f073ce01c7fc0fc51a9b12530a1042b14ed11f
     }
 
     return messages.map((message) => mapMessageToMessageDTO(message));
