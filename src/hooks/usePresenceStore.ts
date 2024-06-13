@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import {devtools} from 'zustand/middleware'
+import { devtools } from "zustand/middleware";
 
 type PresenceState = {
   members: string[];
@@ -8,18 +8,22 @@ type PresenceState = {
   set: (ids: string[]) => void;
 };
 
-const usePresenceStore = create<PresenceState>()(devtools((set) => ({
-  members: [],
-  add: (id) =>
-    set((state) => ({
-      members: [...state.members, id],
-    })),
-  remove: (id) =>
-    set((state) => ({
-      members: [...state.members.filter((member) => member !== id)],
-    })),
-  set: (ids) => set({ members: ids }),
-}), {name:'PresenceStore'}));
+const usePresenceStore = create<PresenceState>()(
+  devtools(
+    (set) => ({
+      members: [],
+      add: (id) =>
+        set((state) => ({
+          members: [...state.members, id],
+        })),
+      remove: (id) =>
+        set((state) => ({
+          members: [...state.members.filter((member) => member !== id)],
+        })),
+      set: (ids) => set({ members: ids }),
+    }),
+    { name: "PresenceStore" }
+  )
+);
 
-
-export default usePresenceStore
+export default usePresenceStore;

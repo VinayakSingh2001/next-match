@@ -4,11 +4,8 @@ import { MessageDTO } from "@/types";
 import React, { useEffect, useRef } from "react";
 import clsx from "clsx";
 import { Avatar, divider } from "@nextui-org/react";
-<<<<<<< HEAD
 import { timeAgo, transformImageUrl } from "@/lib/util";
-=======
-import { transformImageUrl } from "@/lib/util";
->>>>>>> 08f073ce01c7fc0fc51a9b12530a1042b14ed11f
+import PresenceAvatar from "@/components/PresenceAvatar";
 
 type Props = {
   message: MessageDTO;
@@ -25,11 +22,14 @@ export default function MessageBox({ message, currentUserId }: Props) {
   },[messageEndRef])
 
   const renderAvatar = () => (
-    <Avatar
-      name={message.senderName}
-      className="self-end"
+    <div className="self-end">
+ <PresenceAvatar
+      userId={message.senderId}
+      
       src={transformImageUrl(message.senderImage) || "/images/user.png"}
     />
+    </div>
+   
   );
 
   const messageContentClasses = clsx("flex flex-col w-[50%] px-2 py-1", {
@@ -44,11 +44,7 @@ export default function MessageBox({ message, currentUserId }: Props) {
     })}>
         {message.dateRead && message.recipientId !== currentUserId ? (
             <span className="text-xs text-black text-itaic ">
-<<<<<<< HEAD
                 (Read {timeAgo(message.dateRead)})
-=======
-                (Read 4 mins ago)
->>>>>>> 08f073ce01c7fc0fc51a9b12530a1042b14ed11f
             </span>
         ): <div></div>}
         <div className="flex">
@@ -57,6 +53,7 @@ export default function MessageBox({ message, currentUserId }: Props) {
         </div>
     </div>
   )
+
 
   const renderMessageContent = () => {
    return  <div className={messageContentClasses}>

@@ -17,6 +17,7 @@ import React, { Key, useCallback, useState } from "react";
 import { AiFillDelete } from "react-icons/ai";
 import { deleteMessage } from "../actions/messageActions";
 import { truncateString } from "@/lib/util";
+import PresenceAvatar from "@/components/PresenceAvatar";
 
 type Props = {
   messages: MessageDTO[];
@@ -62,14 +63,8 @@ export default function MessageTable({ messages }: Props) {
         case "senderName":
           return (
             <div className="flex items-center gap-2 cursor-pointer">
-              <Avatar
-                src={
-                  (isOutbox ? item.recipientImage : item.senderImage) ||
-                  "images/user.png"
-                }
-                alt="image of member"
-                className="avatar"
-              />
+             
+            <PresenceAvatar userId={isOutbox? item.recipientId : item.senderId} src={isOutbox? item.recipientImage : item.senderImage} />
               <span>{cellValue}</span>
             </div>
           );
