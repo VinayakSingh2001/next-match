@@ -32,6 +32,7 @@ export async function createMessage(
       "message:new",
       messageDTO
     );
+    await pusherServer.trigger(`private-${recipientUserId}`, 'message:new', messageDTO)
 
     return { status: "success", data: messageDTO };
   } catch (error) {
