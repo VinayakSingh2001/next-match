@@ -22,11 +22,11 @@ import MessageTableCell from "./MessageTableCell";
 import { useMessages } from "@/hooks/useMessages";
 
 type Props = {
-  messages: MessageDTO[];
+  initialMessages: MessageDTO[];
 };
 
-export default function MessageTable({ messages }: Props) {
-  const {columns, isOutbox, isDeleting, deleteMessage, selectRow} = useMessages(messages)
+export default function MessageTable({ initialMessages }: Props) {
+  const {columns, isOutbox, isDeleting, deleteMessage, selectRow, messages} = useMessages(initialMessages)
 
   //giving user the ablity to delete (via cusom cell) in order to use cusom cell we need a renderCell function
   // const renderCell = useCallback(

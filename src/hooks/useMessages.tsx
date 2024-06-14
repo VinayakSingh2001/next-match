@@ -2,14 +2,29 @@ import { deleteMessage } from "@/app/actions/messageActions";
 import { MessageDTO } from "@/types";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useState, Key, useCallback } from "react";
+import { useState, Key, useCallback, useEffect } from "react";
+import useMessageStore from "./useMessageStore";
 
-export const useMessages = (messages: MessageDTO[])=>{
+export const useMessages = (initialMessages: MessageDTO[])=>{
+    const {set, remove, messages} = useMessageStore(state => ({
+        set: state.set, 
+        remove:state.remove, 
+        messages: state.messages
+    }))
     const router = useRouter();
     //by default we are working with the INBOX container
     const searchParams = useSearchParams();
     const isOutbox = searchParams.get("container") === "outbox";
     const [isDeleting, setDeleting] = useState({ id: "", loading: false });
+
+    useEffect(()=>{
+        set(initialMessages)
+
+        return ()=>{
+            set([])
+        }
+    },[initialMessages, set])
+
     const handleRowSelect = (key: Key) => {
       const message = messages.find((m) => m.id === key);
       const url = isOutbox
@@ -38,6 +53,6 @@ export const useMessages = (messages: MessageDTO[])=>{
     );
 
     return {
-        isOutbox, columns, deleteMessage: handleDeleteMessage, selectRow: handleRowSelect, isDeleting
+        isOutbox, columns, deleteMessage: handleDeleteMessage, selectRow: handleRowSelect, isDeleting, messages
     }
 }
